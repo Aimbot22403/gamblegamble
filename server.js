@@ -30,13 +30,12 @@ mongoose.connect(MONGO_URI)
     .then(() => console.log("MongoDB connected successfully."))
     .catch(err => console.error("MongoDB connection error:", err));
 
-// --- USER SCHEMA ---
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true },
     coins: { type: Number, default: 10000 },
     bio: { type: String, default: "No bio set." },
-    pfp: { type: String, default: "https://i.imgur.com/jNNT4LE.png" },
+    pfp: { type: String, default: "https://i.imgur.com/8bzvETr.png" },
     online: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
     isOwner: { type: Boolean, default: false },
@@ -54,7 +53,6 @@ const Message = mongoose.model('Message', messageSchema);
 const blackjackGames = new Map();
 const minesGames = new Map();
 
-// --- AUTHENTICATION MIDDLEWARE ---
 const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ message: 'Access denied.' });
@@ -83,7 +81,6 @@ const ownerAuthenticate = async (req, res, next) => {
     }
 };
 
-// --- USER ROUTES ---
 app.post('/api/register', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -127,7 +124,6 @@ app.get('/api/user/:username', async (req, res) => {
     res.json(user || { message: 'User not found' });
 });
 
-// --- GAME ROUTES ---
 const getCardValue = c => { if (['J', 'Q', 'K'].includes(c.value)) return 10; if (c.value === 'A') return 11; return parseInt(c.value); };
 const getHandValue = h => { let v = h.reduce((s, c) => s + getCardValue(c), 0); let a = h.filter(c => c.value === 'A').length; while (v > 21 && a > 0) { v -= 10; a--; } return v; };
 app.post('/api/blackjack/start', authenticateToken, async (req, res) => { const { bet } = req.body; const user = await User.findById(req.user.id); if (blackjackGames.has(req.user.id)) return res.status(400).json({ message: "Finish your current game." }); if (!bet || bet <= 0 || user.coins < bet) return res.status(400).json({ message: "Invalid bet." }); user.coins -= bet; await user.save(); await broadcastOnlineUsers(); const deck = ['H', 'D', 'C', 'S'].flatMap(s => ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'].map(v => ({ suit: s, value: v }))).sort(() => .5 - Math.random()); const pHand = [deck.pop(), deck.pop()], dHand = [deck.pop(), deck.pop()]; const gState = { deck, playerHand: pHand, dealerHand: dHand, bet, status: 'playing' }; blackjackGames.set(req.user.id, gState); if (getHandValue(pHand) === 21) { const w = bet * 2.5; user.coins += w; await user.save(); blackjackGames.delete(req.user.id); await broadcastOnlineUsers(); return res.json({ status: `Blackjack! Win ${w}`, playerHand: pHand, dealerHand: dHand, playerValue: 21, dealerValue: getHandValue(dHand), newBalance: user.coins }); } res.json({ status: 'playing', playerHand: pHand, dealerHand: [dHand[0], { suit: '?', value: '?' }], playerValue: getHandValue(pHand), newBalance: user.coins }); });
