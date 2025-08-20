@@ -58,7 +58,7 @@
         .auth-options label { display: flex; align-items: center; cursor: pointer; }
         .auth-options input[type="checkbox"] { margin-right: 8px; }
 
-        /* === ROULETTE STYLES - COMPLETELY REWRITTEN === */
+        /* === ROULETTE STYLES - REWRITTEN FOR CORRECT LAYOUT === */
         #roulette-tab h1 {
             text-align: center;
             border-bottom: none;
@@ -69,7 +69,7 @@
             justify-content: center;
             align-items: center;
             gap: 40px;
-            flex-wrap: wrap; /* Allows stacking on smaller screens */
+            flex-wrap: wrap;
             padding: 20px;
         }
         .roulette-wheel-container { 
@@ -102,7 +102,6 @@
             height: 100%; 
             border-radius: 50%; 
             position: absolute; 
-            background-color: var(--roulette-black); 
             box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 0 15px rgba(0,0,0,0.3); 
             border: 8px solid #855d3a; 
             transition: background 0.5s ease-in-out;
@@ -173,7 +172,7 @@
             border-radius: var(--border-radius); 
             width: 100%; 
             max-width: 800px;
-            margin: 20px auto; /* Center the table */
+            margin: 20px auto;
         }
         .roulette-grid-container { display: grid; grid-template-columns: 50px 1fr 50px; gap: 5px; }
         .roulette-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; }
@@ -187,14 +186,12 @@
         .outside-bets-2 { display: grid; grid-column: 1 / 4; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 5px; }
         .roulette-cell .bet-chip { position: absolute; bottom: 2px; right: 2px; width: 18px; height: 18px; background-color: #ffeb3b; color: black; font-size: 10px; line-height: 18px; border-radius: 50%; font-weight: bold; text-align: center; box-shadow: 0 0 5px rgba(0,0,0,0.5); display: none; }
         .roulette-cell.has-bet .bet-chip { display: block; }
-        
         #bj-actions-container { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
         #mines-info { display: flex; justify-content: space-between; align-items: center; background: var(--secondary-color); padding: 15px; border-radius: var(--border-radius); margin-top: 20px; }
         #mines-info-stats { display: flex; gap: 20px; }
         #mines-info-stats > div { text-align: center; }
         #mines-info-stats span { display: block; font-size: 14px; color: #aaa; }
         #mines-info-stats strong { font-size: 1.2em; }
-
         .admin-section { margin-bottom: 30px; background-color: var(--secondary-color); padding: 20px; border-radius: var(--border-radius); }
         .admin-section h3 { margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
         .admin-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
@@ -226,7 +223,7 @@
                 <button class="nav-tab active" data-tab="home">Home</button>
                 <button class="nav-tab" data-tab="blackjack">Blackjack</button>
                 <button class="nav-tab" data-tab="mines">Mines</button>
-                <button class="nav-tab" data-tab="roulette">Roulette V2</button>
+                <button class="nav-tab" data-tab="roulette">Roulette</button>
             </nav>
             <div class="user-info">
                 <div class="user-info-header"><div class="user-details"><img id="user-pfp-display" src="" alt="PFP"><div><div id="username-display"></div><div id="coins-display"></div></div></div><button id="menu-button">☰</button></div>
@@ -397,23 +394,25 @@
         
         function renderWheelBackground(winningNumber = null) {
             const bg = $('#roulette-wheel-bg');
+            if (!bg) return;
             const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length;
             const gradientParts = ROULETTE_NUMBERS_ORDER.map((num, i) => {
                 let colorVar = `var(--roulette-${ROULETTE_COLORS[num]})`;
                 if (num === winningNumber) {
-                    colorVar = `var(--safe-color)`; // Highlight winning slice
+                    colorVar = `var(--safe-color)`; // Highlight winning slice green
                 }
                 return `${colorVar} ${i * sliceAngle}deg ${(i + 1) * sliceAngle}deg`;
             });
             bg.style.background = `conic-gradient(${gradientParts.join(', ')})`;
         }
 
-        function createRouletteTable() { const container = $('#roulette-grid-container'); container.innerHTML = ''; const zeroContainer = document.createElement('div'); zeroContainer.className = 'zero-cell'; const grid = document.createElement('div'); grid.className = 'roulette-grid'; const colsContainer = document.createElement('div'); colsContainer.className = 'column-bets'; const outside1 = document.createElement('div'); outside1.className = 'outside-bets-1'; const outside2 = document.createElement('div'); outside2.className = 'outside-bets-2'; const zeroCell = document.createElement('div'); zeroCell.className = 'roulette-cell green'; zeroCell.textContent = '0'; zeroCell.dataset.betType = 'number'; zeroCell.dataset.betValue = '0'; zeroContainer.appendChild(zeroCell); for (let i = 1; i <= 36; i++) { const cell = document.createElement('div'); cell.className = `roulette-cell number ${ROULETTE_COLORS[i]}`; cell.style.gridRow = (i-1) % 3 + 1; cell.style.gridColumn = Math.ceil(i/3); cell.textContent = i; cell.dataset.betType = 'number'; cell.dataset.betValue = i; grid.appendChild(cell); } [{l:'2:1',v:'1st'},{l:'2:1',v:'2nd'},{l:'2:1',v:'3rd'}].forEach(b => { const cell = document.createElement('div'); cell.className = 'roulette-cell outside'; cell.textContent = b.l; cell.dataset.betType = 'column'; cell.dataset.betValue = b.v; colsContainer.appendChild(cell); }); [{l:'1-18',t:'range',v:'1-18'},{l:'Even',t:'parity',v:'even'},{l:'Red',t:'color',v:'red',c:'red'},{l:'Black',t:'color',v:'black',c:'black'},{l:'Odd',t:'parity',v:'odd'},{l:'19-36',t:'range',v:'19-36'}].forEach(b=>{ const cell = document.createElement('div'); cell.className = `roulette-cell outside ${b.c||''}`; cell.textContent = b.l; cell.dataset.betType = b.t; cell.dataset.betValue = b.v; outside1.appendChild(cell); }); [{l:'1st 12',t:'dozen',v:'1st'},{l:'2nd 12',t:'dozen',v:'2nd'},{l:'3rd 12',t:'dozen',v:'3rd'}].forEach(b=>{ const cell = document.createElement('div'); cell.className = 'roulette-cell outside'; cell.textContent = b.l; cell.dataset.betType = b.t; cell.dataset.betValue = b.v; outside2.appendChild(cell); }); container.append(zeroContainer, grid, colsContainer, outside1, outside2); $$('.roulette-cell').forEach(cell => cell.innerHTML += '<span class="bet-chip"></span>'); }
+        function createRouletteTable() { const container = $('#roulette-grid-container'); if (!container) return; container.innerHTML = ''; const zeroContainer = document.createElement('div'); zeroContainer.className = 'zero-cell'; const grid = document.createElement('div'); grid.className = 'roulette-grid'; const colsContainer = document.createElement('div'); colsContainer.className = 'column-bets'; const outside1 = document.createElement('div'); outside1.className = 'outside-bets-1'; const outside2 = document.createElement('div'); outside2.className = 'outside-bets-2'; const zeroCell = document.createElement('div'); zeroCell.className = 'roulette-cell green'; zeroCell.textContent = '0'; zeroCell.dataset.betType = 'number'; zeroCell.dataset.betValue = '0'; zeroContainer.appendChild(zeroCell); for (let i = 1; i <= 36; i++) { const cell = document.createElement('div'); cell.className = `roulette-cell number ${ROULETTE_COLORS[i]}`; cell.style.gridRow = (i-1) % 3 + 1; cell.style.gridColumn = Math.ceil(i/3); cell.textContent = i; cell.dataset.betType = 'number'; cell.dataset.betValue = i; grid.appendChild(cell); } [{l:'2:1',v:'1st'},{l:'2:1',v:'2nd'},{l:'2:1',v:'3rd'}].forEach(b => { const cell = document.createElement('div'); cell.className = 'roulette-cell outside'; cell.textContent = b.l; cell.dataset.betType = 'column'; cell.dataset.betValue = b.v; colsContainer.appendChild(cell); }); [{l:'1-18',t:'range',v:'1-18'},{l:'Even',t:'parity',v:'even'},{l:'Red',t:'color',v:'red',c:'red'},{l:'Black',t:'color',v:'black',c:'black'},{l:'Odd',t:'parity',v:'odd'},{l:'19-36',t:'range',v:'19-36'}].forEach(b=>{ const cell = document.createElement('div'); cell.className = `roulette-cell outside ${b.c||''}`; cell.textContent = b.l; cell.dataset.betType = b.t; cell.dataset.betValue = b.v; outside1.appendChild(cell); }); [{l:'1st 12',t:'dozen',v:'1st'},{l:'2nd 12',t:'dozen',v:'2nd'},{l:'3rd 12',t:'dozen',v:'3rd'}].forEach(b=>{ const cell = document.createElement('div'); cell.className = 'roulette-cell outside'; cell.textContent = b.l; cell.dataset.betType = b.t; cell.dataset.betValue = b.v; outside2.appendChild(cell); }); container.append(zeroContainer, grid, colsContainer, outside1, outside2); $$('.roulette-cell').forEach(cell => cell.innerHTML += '<span class="bet-chip"></span>'); }
         
         function createRouletteWheel() {
             const numbersContainer = $('#wheel-number-container');
+            if (!numbersContainer) return;
             numbersContainer.innerHTML = '';
-            renderWheelBackground(); // Initial render
+            renderWheelBackground();
             const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length;
             ROULETTE_NUMBERS_ORDER.forEach((num, index) => {
                 const rotation = (index * sliceAngle) + (sliceAngle / 2);
@@ -428,13 +427,13 @@
         }
         function handleRouletteBet(e) { if (isSpinning) return; const cell = e.target.closest('.roulette-cell'); if (!cell || !cell.dataset.betType) return; const betAmount = parseInt($('#roulette-bet-amount').value, 10); if (isNaN(betAmount) || betAmount <= 0) { alert("Please enter a valid bet amount."); return; } const { betType, betValue } = cell.dataset; rouletteBets[betType] = rouletteBets[betType] || {}; rouletteBets[betType][betValue] = (rouletteBets[betType][betValue] || 0) + betAmount; updateRouletteUI(); }
         
-        function updateRouletteUI() { let totalBet = 0; $$('.roulette-cell').forEach(cell => { cell.classList.remove('has-bet'); const chip = cell.querySelector('.bet-chip'); if (chip) { chip.style.display = 'none'; } }); for (const type in rouletteBets) { for (const value in rouletteBets[type]) { const amount = rouletteBets[type][value]; totalBet += amount; const cell = $(`.roulette-cell[data-bet-type="${type}"][data-bet-value="${value}"]`); if (cell) { cell.classList.add('has-bet'); const chip = cell.querySelector('.bet-chip'); if (chip) { chip.textContent = amount > 999 ? `${Math.floor(amount/1000)}k` : amount; chip.style.display = 'block'; } } } } $('#roulette-spin-btn').disabled = totalBet === 0 || isSpinning; }
+        function updateRouletteUI() { let totalBet = 0; $$('.roulette-cell').forEach(cell => { cell.classList.remove('has-bet'); const chip = cell.querySelector('.bet-chip'); if (chip) { chip.style.display = 'none'; } }); for (const type in rouletteBets) { for (const value in rouletteBets[type]) { const amount = rouletteBets[type][value]; totalBet += amount; const cell = $(`.roulette-cell[data-bet-type="${type}"][data-bet-value="${value}"]`); if (cell) { cell.classList.add('has-bet'); const chip = cell.querySelector('.bet-chip'); if (chip) { chip.textContent = amount > 999 ? `${Math.floor(amount/1000)}k` : amount; chip.style.display = 'block'; } } } } if ($('#roulette-spin-btn')) $('#roulette-spin-btn').disabled = totalBet === 0 || isSpinning; }
         
-        function clearRouletteBets() { if(isSpinning) return; rouletteBets = {}; $('#roulette-status').textContent = 'Place your bets!'; $('#roulette-status').style.color = 'var(--accent-color)'; renderWheelBackground(); updateRouletteUI(); }
+        function clearRouletteBets() { if(isSpinning) return; rouletteBets = {}; if($('#roulette-status')) $('#roulette-status').textContent = 'Place your bets!'; if($('#roulette-status')) $('#roulette-status').style.color = 'var(--accent-color)'; renderWheelBackground(); updateRouletteUI(); }
         
         async function spinRouletteWheel() { if (isSpinning || Object.keys(rouletteBets).length === 0) return; isSpinning = true; renderWheelBackground(); $('#roulette-status').textContent = 'Spinning...'; $('#roulette-status').style.color = 'var(--accent-color)'; updateRouletteUI(); try { const result = await apiCall('/roulette/spin', { method: 'POST', body: JSON.stringify({ bets: rouletteBets }) }); const { winningNumber, winnings, newBalance, message } = result; const wheel = $('.roulette-wheel'); const numberIndex = ROULETTE_NUMBERS_ORDER.indexOf(winningNumber); const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length; const targetAngle = -(numberIndex * sliceAngle); wheelCurrentRotation = wheelCurrentRotation - (wheelCurrentRotation % 360) + (360 * 10) + targetAngle + (Math.random() * sliceAngle * 0.8 - sliceAngle * 0.4); wheel.style.transform = `rotate(${wheelCurrentRotation}deg)`; setTimeout(() => { isSpinning = false; currentUser.coins = newBalance; updateUserUI(); $('#roulette-status').textContent = message; $('#roulette-status').style.color = winnings > 0 ? 'var(--safe-color)' : 'var(--mine-color)'; renderWheelBackground(winningNumber); rouletteBets = {}; updateRouletteUI(); }, 6100); } catch (err) { alert(err.message); isSpinning = false; clearRouletteBets(); updateRouletteUI(); } }
         
-        function setupRouletteListeners() { createRouletteTable(); createRouletteWheel(); $('#roulette-grid-container').addEventListener('click', handleRouletteBet); $('#roulette-clear-btn').addEventListener('click', clearRouletteBets); $('#roulette-spin-btn').addEventListener('click', spinRouletteWheel); }
+        function setupRouletteListeners() { createRouletteTable(); createRouletteWheel(); const grid = $('#roulette-grid-container'); if (grid) grid.addEventListener('click', handleRouletteBet); const clearBtn = $('#roulette-clear-btn'); if (clearBtn) clearBtn.addEventListener('click', clearRouletteBets); const spinBtn = $('#roulette-spin-btn'); if (spinBtn) spinBtn.addEventListener('click', spinRouletteWheel); }
         
         function loadAdminPanel() { if (!currentUser) return; const isAdmin = currentUser.isAdmin, isOwner = currentUser.isOwner; if (!isAdmin && !isOwner) { $('#admin-actions-container').style.display = 'none'; $('#owner-actions-container').style.display = 'none'; $('#not-admin-message').style.display = 'block'; return; } $('#not-admin-message').style.display = 'none'; $('#admin-actions-container').style.display = 'block'; if (isOwner) $('#owner-actions-container').style.display = 'block'; else $('#owner-actions-container').style.display = 'none'; const twentyFourHours = 24 * 60 * 60 * 1000, lastClaim = new Date(currentUser.lastDailyClaim); if (currentUser.lastDailyClaim && (new Date() - lastClaim < twentyFourHours)) { $('#daily-claim-status').textContent = `Next claim in ${Math.ceil((twentyFourHours - (new Date() - lastClaim)) / (1000 * 60 * 60))} hours.`; $('#claim-daily-btn').disabled = true; } else { $('#daily-claim-status').textContent = 'You can claim your daily 100,000 coins.'; $('#claim-daily-btn').disabled = false; } }
         function setupAdminListeners() {
