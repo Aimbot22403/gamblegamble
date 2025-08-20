@@ -190,7 +190,7 @@
         <aside class="chat-sidebar"><div class="chat-container" style="display: flex; flex-direction: column; height: 50%;"><h3 style="margin: 0 0 10px 0; padding-bottom: 10px; border-bottom: 1px solid var(--secondary-color); font-size: 16px;">Online</h3><ul id="online-users-list" style="list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1;"></ul></div><div class="chat-container" style="display: flex; flex-direction: column; height: 50%;"><h3 style="margin: 0 0 10px 0; padding-bottom: 10px; border-bottom: 1px solid var(--secondary-color); font-size: 16px;">Chat</h3><ul id="chat-messages" style="list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; padding-right: 5px;"></ul><form id="chat-form" style="display: flex; margin-top: 10px;"><input id="chat-input" autocomplete="off" placeholder="Say something..." style="flex-grow: 1; padding: 10px; background-color: var(--secondary-color); border: 1px solid #444; border-radius: var(--border-radius); color: var(--text-color);" /></form></div></aside>
     </div>
 
-    <script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
         let token = null, socket = null, currentUser = null, newPfpBase64 = null;
         let isMinesGameOver = false;
@@ -211,8 +211,44 @@
         async function fetchProfile() { try { currentUser = await apiCall('/profile'); updateUserUI(); } catch (err) { console.error("Failed to fetch profile:", err); logout(false); } }
         function updateUserUI() { if (!currentUser) return; $('#username-display').textContent = currentUser.username; $('#coins-display').textContent = `${currentUser.coins.toLocaleString()} coins`; $('#user-pfp-display').src = currentUser.pfp; }
         
-        function setupWebSocket() { if (socket) socket.disconnect(); socket = io({ auth: { token } }); socket.on('connect_error', (err) => { console.error("Socket connection error:", err.message); logout(false); }); socket.on('online_users', users => { let l = ''; users.sort((a, b) => b.coins - a.coins).forEach(u => { l += `<li data-username="${u.username}" style="display: flex; align-items: center; padding: 6px; border-radius: 8px; transition: background-color 0.2s; cursor: pointer;" onmouseover="this.style.backgroundColor='var(--secondary-color)'" onmouseout="this.style.backgroundColor='transparent'"><img src="${u.pfp}" alt="${u.username}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover; flex-shrink: 0;"><div class="user-details-list" style="flex-grow: 1;"><div class="username" style="font-weight: bold; font-size: 14px;">${u.username}</div><div class="coins" style="font-size: 12px; color: #aaa;">${u.coins.toLocaleString()} coins</div></div></li>`; }); $('#online-users-list').innerHTML = l; }); socket.on('chat_history', msgs => { $('#chat-messages').innerHTML = ''; msgs.forEach(addChatMessage); }); socket.on('chat_message', addChatMessage); socket.on('message_deleted', messageId => { const msgEl = $(`[data-message-id="${messageId}"]`); if (msgEl) msgEl.remove(); }); socket.on('chat_cleared', () => { $('#chat-messages').innerHTML = ''; }); socket.on('chat_error', (msg) => alert(msg)); }
-        function addChatMessage(msg) { const cb = $('#chat-messages'); const isOwnMessage = msg.username === currentUser.username; const fiveMinutes = 5 * 60 * 1000; const isDeletable = (currentUser.isAdmin || currentUser.isOwner) || (isOwnMessage && (Date.now() - new Date(msg.timestamp).getTime() < fiveMinutes)); const deleteButton = isDeletable ? `<span class="delete-msg-btn" data-message-id="${msg._id}" title="Delete message" style="margin-left: auto; font-size: 14px; cursor: pointer; opacity: 0.5; transition: opacity 0.2s;">🗑️</span>` : ''; const escapedMsg = msg.message.replace(/</g, "<").replace(/>/g, ">"); const li = document.createElement('li'); li.className = 'message-item'; li.dataset.messageId = msg._id; li.style.cssText = 'display: flex; align-items: flex-start; padding: 6px 5px; margin-bottom: 6px; word-wrap: break-word; font-size: 14px;'; li.innerHTML = `<img src="${msg.pfp || 'https://i.imgur.com/8bzvETr.png'}" alt="${msg.username}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; object-fit: cover; flex-shrink: 0;"><div class="message-content" style="display: flex; flex-direction: column; flex-grow: 1;"><div class="message-header" style="display: flex; align-items: center;"><span class="message-user" data-username="${msg.username}" style="font-weight: bold; cursor: pointer; color: var(--accent-color);">${msg.username}</span><span class="message-timestamp" style="font-size: 10px; color: #888; margin-left: 8px;">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>${deleteButton}</div><div>${escapedMsg}</div></div>`; cb.appendChild(li); cb.scrollTop = cb.scrollHeight; }
+        function setupWebSocket() { 
+            if (socket) socket.disconnect(); 
+            socket = io({ auth: { token } }); 
+            socket.on('connect_error', (err) => { console.error("Socket connection error:", err.message); logout(false); }); 
+            socket.on('online_users', users => { let l = ''; users.sort((a, b) => b.coins - a.coins).forEach(u => { l += `<li data-username="${u.username}" style="display: flex; align-items: center; padding: 6px; border-radius: 8px; transition: background-color 0.2s; cursor: pointer;" onmouseover="this.style.backgroundColor='var(--secondary-color)'" onmouseout="this.style.backgroundColor='transparent'"><img src="${u.pfp}" alt="${u.username}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover; flex-shrink: 0;"><div class="user-details-list" style="flex-grow: 1;"><div class="username" style="font-weight: bold; font-size: 14px;">${u.username}</div><div class="coins" style="font-size: 12px; color: #aaa;">${u.coins.toLocaleString()} coins</div></div></li>`; }); $('#online-users-list').innerHTML = l; }); 
+            socket.on('chat_history', msgs => { $('#chat-messages').innerHTML = ''; msgs.forEach(addChatMessage); }); 
+            socket.on('chat_message', addChatMessage); 
+            socket.on('message_deleted', messageId => { const msgEl = $(`[data-message-id="${messageId}"]`); if (msgEl) msgEl.remove(); }); 
+            socket.on('chat_cleared', () => { $('#chat-messages').innerHTML = ''; }); 
+            socket.on('chat_error', (msg) => alert(msg)); 
+            
+            $('#chat-form').addEventListener('submit', (e) => {
+                e.preventDefault(); 
+                const input = $('#chat-input');
+                const message = input.value.trim(); 
+                if (message) { 
+                    socket.emit('chat_message', message); 
+                    input.value = ''; 
+                }
+            });
+        }
+        function addChatMessage(msg) { 
+            const cb = $('#chat-messages'); 
+            const isOwnMessage = msg.username === currentUser.username; 
+            const fiveMinutes = 5 * 60 * 1000; 
+            const isDeletable = (currentUser.isAdmin || currentUser.isOwner) || (isOwnMessage && (Date.now() - new Date(msg.timestamp).getTime() < fiveMinutes)); 
+            const deleteButton = isDeletable ? `<span class="delete-msg-btn" data-message-id="${msg._id}" title="Delete message" style="margin-left: auto; font-size: 14px; cursor: pointer; opacity: 0.5; transition: opacity 0.2s;">🗑️</span>` : ''; 
+            
+            const escapedMsg = msg.message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            const li = document.createElement('li'); 
+            li.className = 'message-item'; 
+            li.dataset.messageId = msg._id; 
+            li.style.cssText = 'display: flex; align-items: flex-start; padding: 6px 5px; margin-bottom: 6px; word-wrap: break-word; font-size: 14px;'; 
+            li.innerHTML = `<img src="${msg.pfp || 'https://i.imgur.com/8bzvETr.png'}" alt="${msg.username}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; object-fit: cover; flex-shrink: 0;"><div class="message-content" style="display: flex; flex-direction: column; flex-grow: 1;"><div class="message-header" style="display: flex; align-items: center;"><span class="message-user" data-username="${msg.username}" style="font-weight: bold; cursor: pointer; color: var(--accent-color);">${msg.username}</span><span class="message-timestamp" style="font-size: 10px; color: #888; margin-left: 8px;">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>${deleteButton}</div><div>${escapedMsg}</div></div>`; 
+            cb.appendChild(li); 
+            cb.scrollTop = cb.scrollHeight; 
+        }
         function setupUIEventListeners() { $$('.nav-tab').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab))); $('#menu-button').addEventListener('click', (e) => { e.stopPropagation(); $('#dropdown-menu').style.display = $('#dropdown-menu').style.display === 'block' ? 'none' : 'block'; }); document.addEventListener('click', () => { $('#dropdown-menu').style.display = 'none'; }); $('#profile-btn').addEventListener('click', e => { e.preventDefault(); switchTab('profile-page'); loadProfileForEditing(); }); $('#admin-btn').addEventListener('click', e => { e.preventDefault(); switchTab('admin-page'); loadAdminPanel(); }); $('#save-profile-btn').addEventListener('click', saveProfile); const eventDelegate = (container, event, selector, handler) => { container.addEventListener(event, e => { if (e.target.closest(selector)) handler(e, e.target.closest(selector)); }); }; eventDelegate($('#chat-messages'), 'click', '.message-user', (e, el) => showPublicProfile(el.dataset.username)); eventDelegate($('#chat-messages'), 'click', '.delete-msg-btn', (e, el) => socket.emit('delete_message', el.dataset.messageId)); eventDelegate($('#online-users-list'), 'click', 'li', (e, el) => showPublicProfile(el.dataset.username)); $('#public-profile-modal').addEventListener('click', e => { if (e.target.id === 'public-profile-modal') e.target.classList.add('hidden'); }); $('#profile-pfp-upload').addEventListener('change', handlePfpUpload); setupBlackjackListeners(); setupMinesListeners(); setupRouletteListeners(); setupAdminListeners(); }
         function switchTab(id) { $$('.tab-content').forEach(t => t.classList.remove('active')); $$('.nav-tab').forEach(b => b.classList.remove('active')); const el = $(`#${id}-tab`) || $(`#${id}`); if (el) el.classList.add('active'); const nb = $(`.nav-tab[data-tab="${id}"]`); if (nb) nb.classList.add('active'); }
         function loadProfileForEditing() { $('#profile-pfp-preview').src = currentUser.pfp; $('#profile-bio').value = currentUser.bio; newPfpBase64 = null; $('#profile-pfp-upload').value = ''; }
