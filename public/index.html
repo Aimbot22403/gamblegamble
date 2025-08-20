@@ -58,23 +58,47 @@
         .auth-options label { display: flex; align-items: center; cursor: pointer; }
         .auth-options input[type="checkbox"] { margin-right: 8px; }
 
-        #roulette-tab h1 { text-align: center; border-bottom: none; margin-bottom: 10px; }
+        /* ROULETTE STYLES - MODIFIED FOR NEW LAYOUT */
+        #roulette-tab h1 { text-align: center; border-bottom: none; margin-bottom: 20px; }
         #roulette-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .roulette-top-section { display: flex; align-items: center; justify-content: center; gap: 30px; width: 100%; flex-wrap: wrap; }
-        .roulette-wheel-container { position: relative; width: 300px; height: 300px; flex-shrink: 0; }
+        .roulette-top-section { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 40px; /* Increased gap */
+            width: 100%; 
+            flex-wrap: wrap; 
+        }
+        .roulette-wheel-container { position: relative; width: 320px; height: 320px; flex-shrink: 0; } /* Slightly larger wheel */
         .wheel-marker { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 20px solid var(--accent-color); z-index: 5; }
         .roulette-wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; transition: transform 6s cubic-bezier(0.1, 0.7, 0.3, 1); }
         #roulette-wheel-bg { width: 100%; height: 100%; border-radius: 50%; position: absolute; background-color: var(--roulette-black); box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 0 15px rgba(0,0,0,0.3); border: 8px solid #855d3a; }
         .wheel-number-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         .wheel-number { position: absolute; top: 50%; left: 50%; height: 50%; transform-origin: 0 0; font-weight: bold; font-size: 14px; color: white; text-shadow: 1px 1px 1px #000; text-align: center; }
-        .wheel-number span { display: block; transform: rotate(-90deg) translateY(-142px); }
-        .roulette-controls { display: flex; flex-direction: column; gap: 15px; background-color: var(--secondary-color); padding: 15px; border-radius: var(--border-radius); }
-        .roulette-controls .form-group { display: flex; align-items: center; gap: 10px; }
-        .roulette-controls label { margin-bottom: 0; }
-        .roulette-controls input { max-width: 120px; text-align: right; }
-        .roulette-controls .buttons { display: flex; gap: 10px; }
-        #roulette-status { font-size: 1.2em; font-weight: bold; min-height: 28px; text-align: center; }
-        .roulette-table { background-color: var(--primary-color); padding: 10px; border-radius: var(--border-radius); width: 100%; max-width: 800px; }
+        .wheel-number span { display: block; transform: rotate(-90deg) translateY(-150px); /* Adjusted for larger wheel */ }
+        
+        /* NEW: Class for the winning slot highlight */
+        .wheel-number.winning-slot {
+            background-color: var(--safe-color);
+            transition: background-color 0.5s ease;
+        }
+
+        .roulette-controls { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; /* Increased gap */
+            background-color: var(--secondary-color); 
+            padding: 25px; /* Increased padding */
+            border-radius: var(--border-radius);
+            width: 250px; /* Fixed width for control box */
+            text-align: center;
+        }
+        .roulette-controls .form-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .roulette-controls label { margin-bottom: 0; font-size: 14px; }
+        .roulette-controls input { max-width: 150px; text-align: center; font-size: 16px; }
+        .roulette-controls .buttons { display: flex; gap: 10px; justify-content: center; }
+        #roulette-status { font-size: 1.3em; font-weight: bold; min-height: 30px; text-align: center; }
+        .roulette-table { background-color: var(--primary-color); padding: 10px; border-radius: var(--border-radius); width: 100%; max-width: 800px; margin-top: 20px; }
         .roulette-grid-container { display: grid; grid-template-columns: 50px 1fr 50px; gap: 5px; }
         .roulette-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; }
         .roulette-cell { min-height: 45px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 13px; border-radius: 5px; cursor: pointer; transition: all 0.2s ease-out; position: relative; overflow: hidden; background-color: var(--secondary-color); }
@@ -222,7 +246,6 @@
             socket.on('chat_cleared', () => { $('#chat-messages').innerHTML = ''; });
             socket.on('chat_error', (msg) => alert(msg));
             
-            // CORRECTED: Added chat form submission logic
             $('#chat-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const input = $('#chat-input');
@@ -233,17 +256,13 @@
                 }
             });
         }
-
         function addChatMessage(msg) {
             const cb = $('#chat-messages');
             const isOwnMessage = msg.username === currentUser.username;
             const fiveMinutes = 5 * 60 * 1000;
             const isDeletable = (currentUser.isAdmin || currentUser.isOwner) || (isOwnMessage && (Date.now() - new Date(msg.timestamp).getTime() < fiveMinutes));
             const deleteButton = isDeletable ? `<span class="delete-msg-btn" data-message-id="${msg._id}" title="Delete message" style="margin-left: auto; font-size: 14px; cursor: pointer; opacity: 0.5; transition: opacity 0.2s;">🗑️</span>` : '';
-            
-            // CORRECTED: Properly escape HTML to prevent XSS attacks
             const escapedMsg = msg.message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
             const li = document.createElement('li');
             li.className = 'message-item';
             li.dataset.messageId = msg._id;
@@ -252,7 +271,6 @@
             cb.appendChild(li);
             cb.scrollTop = cb.scrollHeight;
         }
-
         function setupUIEventListeners() { $$('.nav-tab').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab))); $('#menu-button').addEventListener('click', (e) => { e.stopPropagation(); $('#dropdown-menu').style.display = $('#dropdown-menu').style.display === 'block' ? 'none' : 'block'; }); document.addEventListener('click', () => { $('#dropdown-menu').style.display = 'none'; }); $('#profile-btn').addEventListener('click', e => { e.preventDefault(); switchTab('profile-page'); loadProfileForEditing(); }); $('#admin-btn').addEventListener('click', e => { e.preventDefault(); switchTab('admin-page'); loadAdminPanel(); }); $('#save-profile-btn').addEventListener('click', saveProfile); const eventDelegate = (container, event, selector, handler) => { container.addEventListener(event, e => { if (e.target.closest(selector)) handler(e, e.target.closest(selector)); }); }; eventDelegate($('#chat-messages'), 'click', '.message-user', (e, el) => showPublicProfile(el.dataset.username)); eventDelegate($('#chat-messages'), 'click', '.delete-msg-btn', (e, el) => socket.emit('delete_message', el.dataset.messageId)); eventDelegate($('#online-users-list'), 'click', 'li', (e, el) => showPublicProfile(el.dataset.username)); $('#public-profile-modal').addEventListener('click', e => { if (e.target.id === 'public-profile-modal') e.target.classList.add('hidden'); }); $('#profile-pfp-upload').addEventListener('change', handlePfpUpload); setupBlackjackListeners(); setupMinesListeners(); setupRouletteListeners(); setupAdminListeners(); }
         function switchTab(id) { $$('.tab-content').forEach(t => t.classList.remove('active')); $$('.nav-tab').forEach(b => b.classList.remove('active')); const el = $(`#${id}-tab`) || $(`#${id}`); if (el) el.classList.add('active'); const nb = $(`.nav-tab[data-tab="${id}"]`); if (nb) nb.classList.add('active'); }
         function loadProfileForEditing() { $('#profile-pfp-preview').src = currentUser.pfp; $('#profile-bio').value = currentUser.bio; newPfpBase64 = null; $('#profile-pfp-upload').value = ''; }
@@ -268,13 +286,15 @@
         async function handleMineClick(e) { const cell = e.target; if (isMinesGameOver || cell.classList.contains('safe')) return; try { const data = await apiCall('/mines/click', { method: 'POST', body: JSON.stringify({ index: parseInt(cell.dataset.index) }) }); if (data.gameOver) { isMinesGameOver = true; alert(data.message); data.minePositions.forEach(p => $(`.mine-cell[data-index='${p}']`).style.backgroundColor = 'var(--mine-color)'); resetMinesGame(false); } else { cell.style.backgroundColor = 'var(--safe-color)'; cell.classList.add('safe'); $('#mines-cashout-btn').disabled = false; $('#mines-profit').textContent = data.profit; const bet = parseInt($('#mines-bet-amount').value); $('#mines-next-profit').textContent = `${Math.floor(bet * data.nextMultiplier - bet)}`; } } catch (err) { alert(err.message); resetMinesGame(true); } }
         async function cashoutMines() { try { isMinesGameOver = true; const data = await apiCall('/mines/cashout', { method: 'POST' }); alert(data.message); currentUser.coins = data.newBalance; updateUserUI(); resetMinesGame(true); } catch (err) { alert(err.message); } }
         function resetMinesGame(hide) { $('#mines-start-btn').disabled = false; $('#mines-cashout-btn').disabled = true; if (hide) $('#mines-game-area').style.display = 'none'; }
+        
+        // ROULETTE LOGIC --- MODIFIED FOR HIGHLIGHTING
         const ROULETTE_NUMBERS_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26]; const ROULETTE_COLORS = { 0: 'green', 1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black', 7: 'red', 8: 'black', 9: 'red', 10: 'black', 11: 'black', 12: 'red', 13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red', 19: 'red', 20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black', 25: 'red', 26: 'black', 27: 'red', 28: 'black', 29: 'black', 30: 'red', 31: 'black', 32: 'red', 33: 'black', 34: 'red', 35: 'black', 36: 'red' }; let rouletteBets = {}; let isSpinning = false;
         function createRouletteTable() { const container = $('#roulette-grid-container'); container.innerHTML = ''; const zeroContainer = document.createElement('div'); zeroContainer.className = 'zero-cell'; const grid = document.createElement('div'); grid.className = 'roulette-grid'; const colsContainer = document.createElement('div'); colsContainer.className = 'column-bets'; const outside1 = document.createElement('div'); outside1.className = 'outside-bets-1'; const outside2 = document.createElement('div'); outside2.className = 'outside-bets-2'; const zeroCell = document.createElement('div'); zeroCell.className = 'roulette-cell green'; zeroCell.textContent = '0'; zeroCell.dataset.betType = 'number'; zeroCell.dataset.betValue = '0'; zeroContainer.appendChild(zeroCell); for (let i = 1; i <= 36; i++) { const cell = document.createElement('div'); cell.className = `roulette-cell number ${ROULETTE_COLORS[i]}`; cell.style.gridRow = (i-1) % 3 + 1; cell.style.gridColumn = Math.ceil(i/3); cell.textContent = i; cell.dataset.betType = 'number'; cell.dataset.betValue = i; grid.appendChild(cell); } [{l:'2:1',v:'1st'},{l:'2:1',v:'2nd'},{l:'2:1',v:'3rd'}].forEach(b => { const cell = document.createElement('div'); cell.className = 'roulette-cell outside'; cell.textContent = b.l; cell.dataset.betType = 'column'; cell.dataset.betValue = b.v; colsContainer.appendChild(cell); }); [{l:'1-18',t:'range',v:'1-18'},{l:'Even',t:'parity',v:'even'},{l:'Red',t:'color',v:'red',c:'red'},{l:'Black',t:'color',v:'black',c:'black'},{l:'Odd',t:'parity',v:'odd'},{l:'19-36',t:'range',v:'19-36'}].forEach(b=>{ const cell = document.createElement('div'); cell.className = `roulette-cell outside ${b.c||''}`; cell.textContent = b.l; cell.dataset.betType = b.t; cell.dataset.betValue = b.v; outside1.appendChild(cell); }); [{l:'1st 12',t:'dozen',v:'1st'},{l:'2nd 12',t:'dozen',v:'2nd'},{l:'3rd 12',t:'dozen',v:'3rd'}].forEach(b=>{ const cell = document.createElement('div'); cell.className = 'roulette-cell outside'; cell.textContent = b.l; cell.dataset.betType = b.t; cell.dataset.betValue = b.v; outside2.appendChild(cell); }); container.append(zeroContainer, grid, colsContainer, outside1, outside2); $$('.roulette-cell').forEach(cell => cell.innerHTML += '<span class="bet-chip"></span>'); }
-        function createRouletteWheel() { const bg = $('#roulette-wheel-bg'); const numbersContainer = $('#wheel-number-container'); bg.innerHTML = ''; numbersContainer.innerHTML = ''; const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length; const gradientParts = ROULETTE_NUMBERS_ORDER.map((num, i) => { const color = ROULETTE_COLORS[num]; return `var(--roulette-${color}) ${i * sliceAngle}deg ${(i + 1) * sliceAngle}deg`; }); bg.style.background = `conic-gradient(${gradientParts.join(', ')})`; ROULETTE_NUMBERS_ORDER.forEach((num, index) => { const rotation = (index * sliceAngle) + (sliceAngle / 2); const numberDiv = document.createElement('div'); numberDiv.className = 'wheel-number'; numberDiv.style.transform = `rotate(${rotation}deg)`; const numberSpan = document.createElement('span'); numberSpan.textContent = num; numberDiv.appendChild(numberSpan); numbersContainer.appendChild(numberDiv); }); }
+        function createRouletteWheel() { const bg = $('#roulette-wheel-bg'); const numbersContainer = $('#wheel-number-container'); bg.innerHTML = ''; numbersContainer.innerHTML = ''; const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length; const gradientParts = ROULETTE_NUMBERS_ORDER.map((num, i) => { const color = ROULETTE_COLORS[num]; return `var(--roulette-${color}) ${i * sliceAngle}deg ${(i + 1) * sliceAngle}deg`; }); bg.style.background = `conic-gradient(${gradientParts.join(', ')})`; ROULETTE_NUMBERS_ORDER.forEach((num, index) => { const rotation = (index * sliceAngle) + (sliceAngle / 2); const numberDiv = document.createElement('div'); numberDiv.className = 'wheel-number'; numberDiv.style.transform = `rotate(${rotation}deg)`; numberDiv.dataset.number = num; /* Added for easy selection */ const numberSpan = document.createElement('span'); numberSpan.textContent = num; numberDiv.appendChild(numberSpan); numbersContainer.appendChild(numberDiv); }); }
         function handleRouletteBet(e) { if (isSpinning) return; const cell = e.target.closest('.roulette-cell'); if (!cell || !cell.dataset.betType) return; const betAmount = parseInt($('#roulette-bet-amount').value, 10); if (isNaN(betAmount) || betAmount <= 0) { alert("Please enter a valid bet amount."); return; } const { betType, betValue } = cell.dataset; rouletteBets[betType] = rouletteBets[betType] || {}; rouletteBets[betType][betValue] = (rouletteBets[betType][betValue] || 0) + betAmount; updateRouletteUI(); }
         function updateRouletteUI() { let totalBet = 0; $$('.roulette-cell').forEach(cell => { cell.classList.remove('has-bet'); const chip = cell.querySelector('.bet-chip'); if (chip) { chip.style.display = 'none'; } }); for (const type in rouletteBets) { for (const value in rouletteBets[type]) { const amount = rouletteBets[type][value]; totalBet += amount; const cell = $(`.roulette-cell[data-bet-type="${type}"][data-bet-value="${value}"]`); if (cell) { cell.classList.add('has-bet'); const chip = cell.querySelector('.bet-chip'); if (chip) { chip.textContent = amount > 999 ? `${Math.floor(amount/1000)}k` : amount; chip.style.display = 'block'; } } } } $('#roulette-spin-btn').disabled = totalBet === 0 || isSpinning; }
-        function clearRouletteBets() { if(isSpinning) return; rouletteBets = {}; $('#roulette-status').textContent = 'Place your bets!'; $('#roulette-status').style.color = 'var(--accent-color)'; updateRouletteUI(); }
-        async function spinRouletteWheel() { if (isSpinning || Object.keys(rouletteBets).length === 0) return; isSpinning = true; updateRouletteUI(); $('#roulette-status').textContent = 'Spinning...'; $('#roulette-status').style.color = 'var(--accent-color)'; try { const result = await apiCall('/roulette/spin', { method: 'POST', body: JSON.stringify({ bets: rouletteBets }) }); const { winningNumber, winnings, newBalance, message } = result; const wheel = $('.roulette-wheel'); const numberIndex = ROULETTE_NUMBERS_ORDER.indexOf(winningNumber); const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length; const targetAngle = -(numberIndex * sliceAngle) - (sliceAngle / 2); wheelCurrentRotation = wheelCurrentRotation - (wheelCurrentRotation % 360) + (360 * 10) + targetAngle + (Math.random() * 4 - 2); wheel.style.transform = `rotate(${wheelCurrentRotation}deg)`; setTimeout(() => { isSpinning = false; currentUser.coins = newBalance; updateUserUI(); $('#roulette-status').textContent = message; $('#roulette-status').style.color = winnings > 0 ? 'var(--safe-color)' : 'var(--mine-color)'; clearRouletteBets(); }, 6100); } catch (err) { alert(err.message); isSpinning = false; clearRouletteBets(); updateRouletteUI(); } }
+        function clearRouletteBets() { if(isSpinning) return; rouletteBets = {}; $('#roulette-status').textContent = 'Place your bets!'; $('#roulette-status').style.color = 'var(--accent-color)'; const winningSlot = $('.winning-slot'); if (winningSlot) { winningSlot.classList.remove('winning-slot'); } updateRouletteUI(); }
+        async function spinRouletteWheel() { if (isSpinning || Object.keys(rouletteBets).length === 0) return; isSpinning = true; updateRouletteUI(); clearRouletteBets(); /* Clear previous win highlight */ $('#roulette-status').textContent = 'Spinning...'; $('#roulette-status').style.color = 'var(--accent-color)'; try { const result = await apiCall('/roulette/spin', { method: 'POST', body: JSON.stringify({ bets: rouletteBets }) }); const { winningNumber, winnings, newBalance, message } = result; const wheel = $('.roulette-wheel'); const numberIndex = ROULETTE_NUMBERS_ORDER.indexOf(winningNumber); const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length; const targetAngle = -(numberIndex * sliceAngle); wheelCurrentRotation = wheelCurrentRotation - (wheelCurrentRotation % 360) + (360 * 10) + targetAngle + (Math.random() * sliceAngle/2 - sliceAngle/4); wheel.style.transform = `rotate(${wheelCurrentRotation}deg)`; setTimeout(() => { isSpinning = false; currentUser.coins = newBalance; updateUserUI(); $('#roulette-status').textContent = message; $('#roulette-status').style.color = winnings > 0 ? 'var(--safe-color)' : 'var(--mine-color)'; const winningSlotBG = $(`#roulette-wheel-bg .wheel-number[data-number="${winningNumber}"]`); if (winningSlotBG) { const sliceElements = $$('#roulette-wheel-bg .wheel-number'); sliceElements.forEach(el => el.classList.remove('winning-slot')); winningSlotBG.parentElement.classList.add('winning-slot'); } const winningSlot = $(`.wheel-number[data-number="${winningNumber}"]`); if (winningSlot) { winningSlot.classList.add('winning-slot'); } clearRouletteBets(); }, 6100); } catch (err) { alert(err.message); isSpinning = false; clearRouletteBets(); updateRouletteUI(); } }
         function setupRouletteListeners() { createRouletteTable(); createRouletteWheel(); $('#roulette-grid-container').addEventListener('click', handleRouletteBet); $('#roulette-clear-btn').addEventListener('click', clearRouletteBets); $('#roulette-spin-btn').addEventListener('click', spinRouletteWheel); }
         
         function loadAdminPanel() { if (!currentUser) return; const isAdmin = currentUser.isAdmin, isOwner = currentUser.isOwner; if (!isAdmin && !isOwner) { $('#admin-actions-container').style.display = 'none'; $('#owner-actions-container').style.display = 'none'; $('#not-admin-message').style.display = 'block'; return; } $('#not-admin-message').style.display = 'none'; $('#admin-actions-container').style.display = 'block'; if (isOwner) $('#owner-actions-container').style.display = 'block'; else $('#owner-actions-container').style.display = 'none'; const twentyFourHours = 24 * 60 * 60 * 1000, lastClaim = new Date(currentUser.lastDailyClaim); if (currentUser.lastDailyClaim && (new Date() - lastClaim < twentyFourHours)) { $('#daily-claim-status').textContent = `Next claim in ${Math.ceil((twentyFourHours - (new Date() - lastClaim)) / (1000 * 60 * 60))} hours.`; $('#claim-daily-btn').disabled = true; } else { $('#daily-claim-status').textContent = 'You can claim your daily 100,000 coins.'; $('#claim-daily-btn').disabled = false; } }
