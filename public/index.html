@@ -9,7 +9,7 @@
         :root {
             --bg-color: #121212; --primary-color: #1a1a1a; --secondary-color: #252525;
             --text-color: #e0e0e0; --accent-color: #ffffff; --border-radius: 8px;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.4); --safe-color: #2ecc71; --mine-color: #e74c3c;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.4); --safe-color: #27ae60; --mine-color: #e74c3c;
             --roulette-red: #c0392b; --roulette-black: #2c3e50; --roulette-green: #27ae60;
         }
         * { box-sizing: border-box; }
@@ -58,47 +58,126 @@
         .auth-options label { display: flex; align-items: center; cursor: pointer; }
         .auth-options input[type="checkbox"] { margin-right: 8px; }
 
-        /* ROULETTE STYLES - MODIFIED FOR NEW LAYOUT */
-        #roulette-tab h1 { text-align: center; border-bottom: none; margin-bottom: 20px; }
-        #roulette-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        /* ROULETTE STYLES - REWRITTEN FOR LAYOUT */
+        #roulette-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        #roulette-container h1 {
+            border-bottom: none;
+        }
         .roulette-top-section { 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            gap: 40px; /* Increased gap */
+            gap: 40px;
             width: 100%; 
             flex-wrap: wrap; 
         }
-        .roulette-wheel-container { position: relative; width: 320px; height: 320px; flex-shrink: 0; } /* Slightly larger wheel */
-        .wheel-marker { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 20px solid var(--accent-color); z-index: 5; }
-        .roulette-wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; transition: transform 6s cubic-bezier(0.1, 0.7, 0.3, 1); }
-        #roulette-wheel-bg { width: 100%; height: 100%; border-radius: 50%; position: absolute; background-color: var(--roulette-black); box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 0 15px rgba(0,0,0,0.3); border: 8px solid #855d3a; }
-        .wheel-number-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .wheel-number { position: absolute; top: 50%; left: 50%; height: 50%; transform-origin: 0 0; font-weight: bold; font-size: 14px; color: white; text-shadow: 1px 1px 1px #000; text-align: center; }
-        .wheel-number span { display: block; transform: rotate(-90deg) translateY(-150px); /* Adjusted for larger wheel */ }
-        
-        /* NEW: Class for the winning slot highlight */
-        .wheel-number.winning-slot {
-            background-color: var(--safe-color);
-            transition: background-color 0.5s ease;
+        .roulette-wheel-container { 
+            position: relative; 
+            width: 320px; 
+            height: 320px; 
+            flex-shrink: 0; 
         }
-
+        .wheel-marker { 
+            position: absolute; 
+            top: -18px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 0; 
+            height: 0; 
+            border-left: 14px solid transparent; 
+            border-right: 14px solid transparent; 
+            border-top: 20px solid var(--accent-color); 
+            z-index: 5; 
+        }
+        .roulette-wheel { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            position: relative; 
+            transition: transform 6s cubic-bezier(0.1, 0.7, 0.3, 1); 
+        }
+        #roulette-wheel-bg { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            position: absolute; 
+            background-color: var(--roulette-black); 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 0 15px rgba(0,0,0,0.3); 
+            border: 8px solid #855d3a; 
+            transition: background 0.5s ease; /* Smooth transition for color change */
+        }
+        .wheel-number-container { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 2; /* Ensure numbers are above the background */
+        }
+        .wheel-number { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            height: 50%; 
+            transform-origin: 0 0; 
+            font-weight: bold; 
+            font-size: 14px; 
+            color: white; 
+            text-shadow: 1px 1px 1px #000; 
+            text-align: center; 
+        }
+        .wheel-number span { 
+            display: block; 
+            transform: rotate(-90deg) translateY(-150px); 
+        }
         .roulette-controls { 
             display: flex; 
             flex-direction: column; 
-            gap: 20px; /* Increased gap */
+            gap: 20px; 
             background-color: var(--secondary-color); 
-            padding: 25px; /* Increased padding */
+            padding: 25px; 
             border-radius: var(--border-radius);
-            width: 250px; /* Fixed width for control box */
+            width: 250px; 
             text-align: center;
         }
-        .roulette-controls .form-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .roulette-controls label { margin-bottom: 0; font-size: 14px; }
-        .roulette-controls input { max-width: 150px; text-align: center; font-size: 16px; }
-        .roulette-controls .buttons { display: flex; gap: 10px; justify-content: center; }
-        #roulette-status { font-size: 1.3em; font-weight: bold; min-height: 30px; text-align: center; }
-        .roulette-table { background-color: var(--primary-color); padding: 10px; border-radius: var(--border-radius); width: 100%; max-width: 800px; margin-top: 20px; }
+        .roulette-controls .form-group { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .roulette-controls label { 
+            margin-bottom: 0; 
+            font-size: 14px; 
+        }
+        .roulette-controls input { 
+            max-width: 150px; 
+            text-align: center; 
+            font-size: 16px; 
+        }
+        .roulette-controls .buttons { 
+            display: flex; 
+            gap: 10px; 
+            justify-content: center; 
+        }
+        #roulette-status { 
+            font-size: 1.3em; 
+            font-weight: bold; 
+            min-height: 30px; 
+            text-align: center; 
+        }
+        .roulette-table { 
+            background-color: var(--primary-color); 
+            padding: 10px; 
+            border-radius: var(--border-radius); 
+            width: 100%; 
+            max-width: 800px; 
+        }
         .roulette-grid-container { display: grid; grid-template-columns: 50px 1fr 50px; gap: 5px; }
         .roulette-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; }
         .roulette-cell { min-height: 45px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 13px; border-radius: 5px; cursor: pointer; transition: all 0.2s ease-out; position: relative; overflow: hidden; background-color: var(--secondary-color); }
@@ -164,7 +243,36 @@
             <div id="profile-page" class="tab-content"><h1>Edit Profile</h1><img id="profile-pfp-preview" src="" alt="Your PFP" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); margin-bottom: 20px;"><div class="form-group" style="text-align: left; margin-bottom: 20px;"><label for="profile-pfp-upload" style="display: block; margin-bottom: 8px; color: #aaa;">Upload New Profile Picture</label><input type="file" id="profile-pfp-upload" accept="image/jpeg, image/png, image/gif" style="width: 100%; padding: 8px; background-color: var(--secondary-color); border: 1px solid #444; border-radius: var(--border-radius); color: var(--text-color);"><small style="color:#aaa; margin-top:5px; display:block;">Max 25MB. Your old picture will be replaced.</small></div><div class="form-group" style="text-align: left; margin-bottom: 20px;"><label for="profile-bio" style="display: block; margin-bottom: 8px; color: #aaa;">Bio</label><textarea id="profile-bio" placeholder="Tell everyone a little about yourself..." style="width: 100%; padding: 12px; background-color: var(--secondary-color); border: 1px solid #444; border-radius: var(--border-radius); color: var(--text-color); min-height: 80px; resize: vertical;"></textarea></div><button id="save-profile-btn" class="custom-button">Save Changes</button></div>
             <div id="blackjack-tab" class="tab-content"><div class="game-container"><div class="game-controls"><div class="form-group"><label for="bj-bet-amount">Bet</label><input type="number" id="bj-bet-amount" value="100"></div><button id="bj-start-btn" class="custom-button">Start</button></div><div id="blackjack-game-area" class="game-area" style="display: none; text-align:center;"><div class="hand-container" style="margin: 20px 0; min-height: 150px;"><h3>Dealer (<span id="dealer-score">0</span>)</h3><div class="cards" id="dealer-cards" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; min-height: 125px;"></div></div><div class="game-status" id="bj-status" style="font-size: 1.2em; font-weight: bold; min-height: 30px; margin-top: 20px; color: var(--accent-color);"></div><div id="bj-actions" class="hand-container" style="margin: 20px 0; min-height: 150px;"><h3>You (<span id="player-score">0</span>)</h3><div class="cards" id="player-cards" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; min-height: 125px;"></div><div id="bj-actions-container"><button id="bj-hit-btn" class="custom-button">Hit</button><button id="bj-stand-btn" class="custom-button">Stand</button></div></div></div></div></div>
             <div id="mines-tab" class="tab-content"><div class="game-container"><div class="game-controls"><div class="form-group"><label for="mines-bet-amount">Bet</label><input type="number" id="mines-bet-amount" value="100"></div><div class="form-group"><label for="mines-count">Mines</label><select id="mines-count"><option value="3">3</option><option value="5">5</option><option value="8">8</option><option value="10">10</option></select></div><button id="mines-start-btn" class="custom-button">Start</button></div><div id="mines-game-area" style="display: none;"><div class="mines-grid" id="mines-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-width: 350px; margin: 20px auto;"></div><div id="mines-info"><div id="mines-info-stats"><div><span>Profit</span><strong id="mines-profit">0</strong></div><div><span>Next Tile</span><strong id="mines-next-profit">0</strong></div></div><button id="mines-cashout-btn" class="custom-button" disabled>Cashout</button></div></div></div></div>
-            <div id="roulette-tab" class="tab-content"><div id="roulette-container"><h1>Roulette</h1><div class="roulette-top-section"><div class="roulette-wheel-container"><div class="wheel-marker"></div><div class="roulette-wheel"><div id="roulette-wheel-bg"></div><div class="wheel-number-container" id="wheel-number-container"></div></div></div><div class="roulette-controls"><div class="form-group"><label for="roulette-bet-amount">Bet Amount:</label><input type="number" id="roulette-bet-amount" value="100"></div><div id="roulette-status">Place your bets!</div><div class="buttons"><button id="roulette-spin-btn" class="custom-button">Spin</button><button id="roulette-clear-btn" class="custom-button">Clear Bets</button></div></div></div><div class="roulette-table"><div class="roulette-grid-container" id="roulette-grid-container"></div></div></div></div>
+            
+            <!-- ROULETTE HTML - RESTRUCTURED -->
+            <div id="roulette-tab" class="tab-content">
+                <div id="roulette-container">
+                    <h1>Roulette</h1>
+                    <div class="roulette-top-section">
+                        <div class="roulette-wheel-container">
+                            <div class="wheel-marker"></div>
+                            <div class="roulette-wheel">
+                                <div id="roulette-wheel-bg"></div>
+                                <div class="wheel-number-container" id="wheel-number-container"></div>
+                            </div>
+                        </div>
+                        <div class="roulette-controls">
+                            <div class="form-group">
+                                <label for="roulette-bet-amount">Bet Amount:</label>
+                                <input type="number" id="roulette-bet-amount" value="100">
+                            </div>
+                            <div id="roulette-status">Place your bets!</div>
+                            <div class="buttons">
+                                <button id="roulette-spin-btn" class="custom-button">Spin</button>
+                                <button id="roulette-clear-btn" class="custom-button">Clear Bets</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="roulette-table">
+                        <div class="roulette-grid-container" id="roulette-grid-container"></div>
+                    </div>
+                </div>
+            </div>
             
             <div id="admin-page" class="tab-content">
                 <h1>Admin Panel</h1>
@@ -287,14 +395,49 @@
         async function cashoutMines() { try { isMinesGameOver = true; const data = await apiCall('/mines/cashout', { method: 'POST' }); alert(data.message); currentUser.coins = data.newBalance; updateUserUI(); resetMinesGame(true); } catch (err) { alert(err.message); } }
         function resetMinesGame(hide) { $('#mines-start-btn').disabled = false; $('#mines-cashout-btn').disabled = true; if (hide) $('#mines-game-area').style.display = 'none'; }
         
-        // ROULETTE LOGIC --- MODIFIED FOR HIGHLIGHTING
-        const ROULETTE_NUMBERS_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26]; const ROULETTE_COLORS = { 0: 'green', 1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black', 7: 'red', 8: 'black', 9: 'red', 10: 'black', 11: 'black', 12: 'red', 13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red', 19: 'red', 20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black', 25: 'red', 26: 'black', 27: 'red', 28: 'black', 29: 'black', 30: 'red', 31: 'black', 32: 'red', 33: 'black', 34: 'red', 35: 'black', 36: 'red' }; let rouletteBets = {}; let isSpinning = false;
+        // ROULETTE LOGIC --- REWRITTEN FOR NEW VISUALS
+        const ROULETTE_NUMBERS_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26]; 
+        const ROULETTE_COLORS = { 0: 'green', 1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black', 7: 'red', 8: 'black', 9: 'red', 10: 'black', 11: 'black', 12: 'red', 13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red', 19: 'red', 20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black', 25: 'red', 26: 'black', 27: 'red', 28: 'black', 29: 'black', 30: 'red', 31: 'black', 32: 'red', 33: 'black', 34: 'red', 35: 'black', 36: 'red' }; 
+        let rouletteBets = {}; 
+        let isSpinning = false;
+        
+        function renderWheelBackground(winningNumber = null) {
+            const bg = $('#roulette-wheel-bg');
+            const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length;
+            const gradientParts = ROULETTE_NUMBERS_ORDER.map((num, i) => {
+                let colorVar;
+                if (num === winningNumber) {
+                    colorVar = 'var(--safe-color)'; // Use the green safe color for the winning number
+                } else {
+                    const colorName = ROULETTE_COLORS[num];
+                    colorVar = `var(--roulette-${colorName})`;
+                }
+                return `${colorVar} ${i * sliceAngle}deg ${(i + 1) * sliceAngle}deg`;
+            });
+            bg.style.background = `conic-gradient(${gradientParts.join(', ')})`;
+        }
+
         function createRouletteTable() { const container = $('#roulette-grid-container'); container.innerHTML = ''; const zeroContainer = document.createElement('div'); zeroContainer.className = 'zero-cell'; const grid = document.createElement('div'); grid.className = 'roulette-grid'; const colsContainer = document.createElement('div'); colsContainer.className = 'column-bets'; const outside1 = document.createElement('div'); outside1.className = 'outside-bets-1'; const outside2 = document.createElement('div'); outside2.className = 'outside-bets-2'; const zeroCell = document.createElement('div'); zeroCell.className = 'roulette-cell green'; zeroCell.textContent = '0'; zeroCell.dataset.betType = 'number'; zeroCell.dataset.betValue = '0'; zeroContainer.appendChild(zeroCell); for (let i = 1; i <= 36; i++) { const cell = document.createElement('div'); cell.className = `roulette-cell number ${ROULETTE_COLORS[i]}`; cell.style.gridRow = (i-1) % 3 + 1; cell.style.gridColumn = Math.ceil(i/3); cell.textContent = i; cell.dataset.betType = 'number'; cell.dataset.betValue = i; grid.appendChild(cell); } [{l:'2:1',v:'1st'},{l:'2:1',v:'2nd'},{l:'2:1',v:'3rd'}].forEach(b => { const cell = document.createElement('div'); cell.className = 'roulette-cell outside'; cell.textContent = b.l; cell.dataset.betType = 'column'; cell.dataset.betValue = b.v; colsContainer.appendChild(cell); }); [{l:'1-18',t:'range',v:'1-18'},{l:'Even',t:'parity',v:'even'},{l:'Red',t:'color',v:'red',c:'red'},{l:'Black',t:'color',v:'black',c:'black'},{l:'Odd',t:'parity',v:'odd'},{l:'19-36',t:'range',v:'19-36'}].forEach(b=>{ const cell = document.createElement('div'); cell.className = `roulette-cell outside ${b.c||''}`; cell.textContent = b.l; cell.dataset.betType = b.t; cell.dataset.betValue = b.v; outside1.appendChild(cell); }); [{l:'1st 12',t:'dozen',v:'1st'},{l:'2nd 12',t:'dozen',v:'2nd'},{l:'3rd 12',t:'dozen',v:'3rd'}].forEach(b=>{ const cell = document.createElement('div'); cell.className = 'roulette-cell outside'; cell.textContent = b.l; cell.dataset.betType = b.t; cell.dataset.betValue = b.v; outside2.appendChild(cell); }); container.append(zeroContainer, grid, colsContainer, outside1, outside2); $$('.roulette-cell').forEach(cell => cell.innerHTML += '<span class="bet-chip"></span>'); }
-        function createRouletteWheel() { const bg = $('#roulette-wheel-bg'); const numbersContainer = $('#wheel-number-container'); bg.innerHTML = ''; numbersContainer.innerHTML = ''; const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length; const gradientParts = ROULETTE_NUMBERS_ORDER.map((num, i) => { const color = ROULETTE_COLORS[num]; return `var(--roulette-${color}) ${i * sliceAngle}deg ${(i + 1) * sliceAngle}deg`; }); bg.style.background = `conic-gradient(${gradientParts.join(', ')})`; ROULETTE_NUMBERS_ORDER.forEach((num, index) => { const rotation = (index * sliceAngle) + (sliceAngle / 2); const numberDiv = document.createElement('div'); numberDiv.className = 'wheel-number'; numberDiv.style.transform = `rotate(${rotation}deg)`; numberDiv.dataset.number = num; /* Added for easy selection */ const numberSpan = document.createElement('span'); numberSpan.textContent = num; numberDiv.appendChild(numberSpan); numbersContainer.appendChild(numberDiv); }); }
+        function createRouletteWheel() {
+            const numbersContainer = $('#wheel-number-container');
+            numbersContainer.innerHTML = '';
+            renderWheelBackground(); // Initial render with default colors
+            const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length;
+            ROULETTE_NUMBERS_ORDER.forEach((num, index) => {
+                const rotation = (index * sliceAngle) + (sliceAngle / 2);
+                const numberDiv = document.createElement('div');
+                numberDiv.className = 'wheel-number';
+                numberDiv.style.transform = `rotate(${rotation}deg)`;
+                const numberSpan = document.createElement('span');
+                numberSpan.textContent = num;
+                numberDiv.appendChild(numberSpan);
+                numbersContainer.appendChild(numberDiv);
+            });
+        }
         function handleRouletteBet(e) { if (isSpinning) return; const cell = e.target.closest('.roulette-cell'); if (!cell || !cell.dataset.betType) return; const betAmount = parseInt($('#roulette-bet-amount').value, 10); if (isNaN(betAmount) || betAmount <= 0) { alert("Please enter a valid bet amount."); return; } const { betType, betValue } = cell.dataset; rouletteBets[betType] = rouletteBets[betType] || {}; rouletteBets[betType][betValue] = (rouletteBets[betType][betValue] || 0) + betAmount; updateRouletteUI(); }
         function updateRouletteUI() { let totalBet = 0; $$('.roulette-cell').forEach(cell => { cell.classList.remove('has-bet'); const chip = cell.querySelector('.bet-chip'); if (chip) { chip.style.display = 'none'; } }); for (const type in rouletteBets) { for (const value in rouletteBets[type]) { const amount = rouletteBets[type][value]; totalBet += amount; const cell = $(`.roulette-cell[data-bet-type="${type}"][data-bet-value="${value}"]`); if (cell) { cell.classList.add('has-bet'); const chip = cell.querySelector('.bet-chip'); if (chip) { chip.textContent = amount > 999 ? `${Math.floor(amount/1000)}k` : amount; chip.style.display = 'block'; } } } } $('#roulette-spin-btn').disabled = totalBet === 0 || isSpinning; }
-        function clearRouletteBets() { if(isSpinning) return; rouletteBets = {}; $('#roulette-status').textContent = 'Place your bets!'; $('#roulette-status').style.color = 'var(--accent-color)'; const winningSlot = $('.winning-slot'); if (winningSlot) { winningSlot.classList.remove('winning-slot'); } updateRouletteUI(); }
-        async function spinRouletteWheel() { if (isSpinning || Object.keys(rouletteBets).length === 0) return; isSpinning = true; updateRouletteUI(); clearRouletteBets(); /* Clear previous win highlight */ $('#roulette-status').textContent = 'Spinning...'; $('#roulette-status').style.color = 'var(--accent-color)'; try { const result = await apiCall('/roulette/spin', { method: 'POST', body: JSON.stringify({ bets: rouletteBets }) }); const { winningNumber, winnings, newBalance, message } = result; const wheel = $('.roulette-wheel'); const numberIndex = ROULETTE_NUMBERS_ORDER.indexOf(winningNumber); const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length; const targetAngle = -(numberIndex * sliceAngle); wheelCurrentRotation = wheelCurrentRotation - (wheelCurrentRotation % 360) + (360 * 10) + targetAngle + (Math.random() * sliceAngle/2 - sliceAngle/4); wheel.style.transform = `rotate(${wheelCurrentRotation}deg)`; setTimeout(() => { isSpinning = false; currentUser.coins = newBalance; updateUserUI(); $('#roulette-status').textContent = message; $('#roulette-status').style.color = winnings > 0 ? 'var(--safe-color)' : 'var(--mine-color)'; const winningSlotBG = $(`#roulette-wheel-bg .wheel-number[data-number="${winningNumber}"]`); if (winningSlotBG) { const sliceElements = $$('#roulette-wheel-bg .wheel-number'); sliceElements.forEach(el => el.classList.remove('winning-slot')); winningSlotBG.parentElement.classList.add('winning-slot'); } const winningSlot = $(`.wheel-number[data-number="${winningNumber}"]`); if (winningSlot) { winningSlot.classList.add('winning-slot'); } clearRouletteBets(); }, 6100); } catch (err) { alert(err.message); isSpinning = false; clearRouletteBets(); updateRouletteUI(); } }
+        function clearRouletteBets() { if(isSpinning) return; rouletteBets = {}; $('#roulette-status').textContent = 'Place your bets!'; $('#roulette-status').style.color = 'var(--accent-color)'; renderWheelBackground(); updateRouletteUI(); }
+        async function spinRouletteWheel() { if (isSpinning || Object.keys(rouletteBets).length === 0) return; isSpinning = true; updateRouletteUI(); renderWheelBackground(); $('#roulette-status').textContent = 'Spinning...'; $('#roulette-status').style.color = 'var(--accent-color)'; try { const result = await apiCall('/roulette/spin', { method: 'POST', body: JSON.stringify({ bets: rouletteBets }) }); const { winningNumber, winnings, newBalance, message } = result; const wheel = $('.roulette-wheel'); const numberIndex = ROULETTE_NUMBERS_ORDER.indexOf(winningNumber); const sliceAngle = 360 / ROULETTE_NUMBERS_ORDER.length; const targetAngle = -(numberIndex * sliceAngle) - (sliceAngle / 2); wheelCurrentRotation = wheelCurrentRotation - (wheelCurrentRotation % 360) + (360 * 10) + targetAngle + (Math.random() * 4 - 2); wheel.style.transform = `rotate(${wheelCurrentRotation}deg)`; setTimeout(() => { isSpinning = false; currentUser.coins = newBalance; updateUserUI(); $('#roulette-status').textContent = message; $('#roulette-status').style.color = winnings > 0 ? 'var(--safe-color)' : 'var(--mine-color)'; renderWheelBackground(winningNumber); rouletteBets = {}; updateRouletteUI(); }, 6100); } catch (err) { alert(err.message); isSpinning = false; clearRouletteBets(); updateRouletteUI(); } }
         function setupRouletteListeners() { createRouletteTable(); createRouletteWheel(); $('#roulette-grid-container').addEventListener('click', handleRouletteBet); $('#roulette-clear-btn').addEventListener('click', clearRouletteBets); $('#roulette-spin-btn').addEventListener('click', spinRouletteWheel); }
         
         function loadAdminPanel() { if (!currentUser) return; const isAdmin = currentUser.isAdmin, isOwner = currentUser.isOwner; if (!isAdmin && !isOwner) { $('#admin-actions-container').style.display = 'none'; $('#owner-actions-container').style.display = 'none'; $('#not-admin-message').style.display = 'block'; return; } $('#not-admin-message').style.display = 'none'; $('#admin-actions-container').style.display = 'block'; if (isOwner) $('#owner-actions-container').style.display = 'block'; else $('#owner-actions-container').style.display = 'none'; const twentyFourHours = 24 * 60 * 60 * 1000, lastClaim = new Date(currentUser.lastDailyClaim); if (currentUser.lastDailyClaim && (new Date() - lastClaim < twentyFourHours)) { $('#daily-claim-status').textContent = `Next claim in ${Math.ceil((twentyFourHours - (new Date() - lastClaim)) / (1000 * 60 * 60))} hours.`; $('#claim-daily-btn').disabled = true; } else { $('#daily-claim-status').textContent = 'You can claim your daily 100,000 coins.'; $('#claim-daily-btn').disabled = false; } }
